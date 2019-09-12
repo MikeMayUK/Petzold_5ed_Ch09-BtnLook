@@ -112,19 +112,65 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             cxChar = LOWORD(GetDialogBaseUnits());
             cyChar = HIWORD(GetDialogBaseUnits());
 
+            for (i = 0; i < NUM; i++)
+            {
+                hwndButton[i] = CreateWindow(TEXT("BUTTON"),
+                    button[i].szText,
+                    WS_CHILD | WS_VISIBLE | button[i].iStyle,
+                    cxChar, cyChar * (1 + 2 * i),
+                    20 * cxChar, 7 * cyChar / 4,
+                    hwnd, (HMENU) (UINT_PTR) i,
+                    ((LPCREATESTRUCT)lParam)->hInstance, NULL);
+            }
+
             return 0;
         }
 
         case WM_SIZE:
         {
+            rect.left   = 24 * cxChar;
+            rect.top    = 2 * cxChar;
+            rect.right  = LOWORD(lParam);
+            rect.bottom = HIWORD(lParam);
 
             return 0;
         }
 
         case WM_PAINT:
         {
+            InvalidateRect(hwnd, &rect, TRUE);
+
+            hdc = BeginPaint(hwnd, &ps);
+            SelectObject(hdc, GetStockObject(SYSTEM_FIXED_FONT));
+            SetBkMode(hdc, TRANSPARENT);
+            TextOut(hdc, 24 * cxChar, cyChar, szTop, lstrlen(szTop));
+            TextOut(hdc, 24 * cxChar, cyChar, szUnd, lstrlen(szUnd));
+
+            EndPaint(hwnd, &ps);
 
             return 0;
+        }
+
+
+        case WM_DRAWITEM:
+        case WM_COMMAND:
+        {
+            ScrollWindow(hwnd, 0, -cyChar, &rect, &rect);
+
+            hdc = GetDC(hwnd);
+            SelectObject(hdc, GetStockObject(SYSTEM_FIXED_FONT));
+
+            TextOut(hdc, 24 * cxChar, cyChar * (rect.bottom / cyChar - 1),
+                szBuffer,
+                wsprintf(szBuffer, szFormat,
+                    message == WM_DRAWITEM ? TEXT("WM_DRAWITEM") : TEXT("WM_COMMAND"),
+                    HIWORD(wParam), LOWORD(wParam),
+                    HIWORD(lParam), LOWORD(lParam)));
+
+            ReleaseDC(hwnd, hdc);
+            ValidateRect(hwnd, &rect);
+
+            break;
         }
 
         case WM_DESTROY:
