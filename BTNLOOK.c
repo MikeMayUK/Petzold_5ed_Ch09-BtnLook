@@ -10,6 +10,7 @@ Change Log
 
 #define WINVER 0x0500
 #include <windows.h>
+#include <windowsx.h>
 
 struct
 {
@@ -129,9 +130,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         case WM_SIZE:
         {
             rect.left   = 24 * cxChar;
-            rect.top    = 2 * cxChar;
-            rect.right  = LOWORD(lParam);
-            rect.bottom = HIWORD(lParam);
+            rect.top    = 2 * cyChar;
+            rect.right  = GET_X_LPARAM(lParam);
+            rect.bottom = GET_Y_LPARAM(lParam);
 
             return 0;
         }
@@ -158,7 +159,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             ScrollWindow(hwnd, 0, -cyChar, &rect, &rect);
 
             hdc = GetDC(hwnd);
-            SelectObject(hdc, GetStockObject(SYSTEM_FIXED_FONT));
 
             TextOut(hdc, 24 * cxChar, cyChar * (rect.bottom / cyChar - 1),
                 szBuffer,
