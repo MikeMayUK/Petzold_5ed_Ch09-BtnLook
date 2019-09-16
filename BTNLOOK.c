@@ -1,5 +1,5 @@
 /*----------------------------------------------------
-BTNLOOK.C -- System Metrics Display Program No. 1
+BTNLOOK.C -- Button look program
                 (c) Charles Petzold, 1998
 ----------------------------------------------------*/
 
